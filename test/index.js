@@ -17,7 +17,7 @@ test('util.getValueFromWageAndExp', function(t) {
   	t.fail('does not factor in experiance');
   }
 
-  t.equal(util.getValueFromWageAndExp(34, 1.3), false, 
+  t.equal(util.getValueFromWageAndExp(34, 1.3), false,
   	"getValueFromWageAndExp catches a partial year input and returns false");
 
   t.end();
@@ -39,7 +39,7 @@ test('util.sortInternObjects', function(t) {
 		expectedArr[3]  // 0
 	];
 
-	// Lets make a copy of the input to sort with the function 
+	// Lets make a copy of the input to sort with the function
 	var actualArr = inputArr.slice();
 
 	// Sort by reference (in-place)
@@ -66,6 +66,115 @@ test('util.sortInternObjects', function(t) {
 });
 
 // Your tests go here  (methods reference: https://www.npmjs.com/package/tape#testname-opts-cb )
+
+test('bracketfromGPA', function(t) {
+
+t.deepEqual( recruiter.bracketFromGPA(3.5),3, "return bracket 3");
+t.deepEqual( recruiter.bracketFromGPA(2.99), 1, "return bracket 1");
+t.deepEqual( recruiter.bracketFromGPA(3.4),2, "return bracket 2");
+t.deepEqual( recruiter.bracketFromGPA(2.49),0, "return bracket 0 (unhireable)");
+
+t.end();
+});
+
+//degrees in astrology can always be hired
+test('astrology', function(t) {
+  var inputArr = [interns[0], interns[1], interns[2], interns[3]];
+  var inputArr2 =  inputArr.slice();
+  inputArr2[0].degree = "polysci";
+  inputArr2[1].degree = "project management";
+  inputArr2[2].degree = "project management";
+  inputArr2[3].degree = "astrology";
+
+  var outputArr = recruiter.recruiter(inputArr2);
+  console.log(outputArr);
+  for (var i = 0; i<outputArr.length; i++){
+    console.log(outputArr[i].degree);
+    if( (outputArr[i].degree).includes("astrology")){
+      var x = outputArr[i];
+      console.log(x);
+    }
+  }
+//  console.log("Guy with astrology degree: ");
+//  console.log(x);
+//  console.log("Third guy in array: ");
+//  console.log(inputArr2[3]);
+  t.deepEqual(x, inputArr2[3]);
+
+   t.end();
+ });
+
+// Don't hire gpa <2.5
+ test('gpa', function(t) {
+   var inputArr = [interns[0], interns[1], interns[2], interns[3]];
+   var inputArr3 =  inputArr.slice();
+   inputArr3[0].gpa = 3.5;
+   inputArr3[1].gpa = 4;
+   inputArr3[2].gpa = 4;
+   inputArr3[3].gpa = 1;
+
+   var outputArr2 = recruiter.recruiter(inputArr3);
+   for (var i=0; i<outputArr2.length; i++){
+     if (inputArr3[3] == outputArr2[i]){
+       t.fail('does not pass condition');
+     }
+   }
+    	t.pass('passes condition');
+
+    t.end();
+  });
+
+/////////////////////
+
+
+
+test('recruiter function', function(t) {
+
+t.comment("Don't hire people with degrees we don't recognize");
+var collArr = [
+  interns[0],
+  interns[6],
+  interns[7]
+];
+
+var inputArr = collArr.slice();
+inputArr[1].degree = "waffle maker";
+inputArr[2].degree = "";
+
+var retArr = [];
+retArr = recruiter.recruiter(inputArr);
+t.deepEqual(retArr.length, 1, "Returns expected number of interns");
+t.deepEqual(retArr[0].degree, "advertising", "Returns the accepted degree");
+
+
+t.comment("Sort secondarily by GPA bracket");
+
+collArr = [
+  interns[13],
+  interns[14],
+  interns[15],
+  interns[16]
+];
+
+inputArr = collArr.slice();
+
+inputArr[0].experiance = 0;
+inputArr[0].degree = "human resources management";
+inputArr[3].experiance = 0;
+inputArr[3].degree = "human resources management";
+
+t.ok(inputArr[0].gpa === 3.1 && inputArr[1].gpa === 2.07 && inputArr[2].gpa === 2.32 && inputArr[3].gpa === 3.93, "test input is as expected" );
+
+retArr = recruiter.recruiter(inputArr);
+
+t.deepEqual(retArr.length, 2, "Returns expected number of interns, removes GPAs below 2.5");
+t.deepEqual(retArr[0].gpa === 3.93, "Returns expected GPA order");
+t.ok(retArr[0].metric > retArr[1].metric, "Returns metrics in order");
+
+t.end();
+});
+
+
 
 // test('Test Name', function(t) {
 
